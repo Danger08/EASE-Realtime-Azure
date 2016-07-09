@@ -6,39 +6,41 @@ var io = require('socket.io')(http);
 
 //mysql
 var mysql      = require('mysql');
-// var connection = mysql.createConnection({
-//   host     : 'db4free.net',
-//   user     : 'easetech',
-//   password : 'summer08',
-//   database : 'easetech'
-// });
 var connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'root',
-  password : 'root',
-  database : 'chat'
+  host     : 'db4free.net',
+  user     : 'easetech',
+  password : 'summer08',
+  database : 'easetech'
 });
+// var connection = mysql.createConnection({
+//   host     : 'localhost',
+//   user     : 'root',
+//   password : 'root',
+//   database : 'chat'
+// });
 
 //
 
 var connectedUsers = [];
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/HTMLPage.html');
-});
 
+app.get('/', function(req, res){
+  res.sendFile(__dirname + '/template/chat.html');
+});
+console.log(__dirname + '/template/js');
+app.use("/js", express.static(__dirname + '/template/js'));
 io.on('connection', function(socket){
 
   socket.on('disconnect', function(){
-  console.log('user disconnected' + socket.id);
-  var elementPos = connectedUsers.map(function(x) { console.log(x); return x.username; }).indexOf(socket.id);
-  var objectFound = connectedUsers[elementPos];
-  console.log(objectFound);
+    findUser(connectedUsers,socket);
   });
+
+
   socket.on('user joined' , function(username){
   console.log(username+ ' joined');
   connectedUsers[username] = socket.id;
   console.log(connectedUsers);
   });
+
   socket.on('chat message' , function(msg){
     io.emit('chat message' , msg);
 
@@ -52,3 +54,9 @@ io.on('connection', function(socket){
 http.listen(process.env.PORT || 8080, function(){
   console.log('listening on port 8080');
 });
+
+function findUser(obj , id){
+  for (var i = 0; i < obj.length; i++) {
+    console.log(obj[i]);
+  }
+}
